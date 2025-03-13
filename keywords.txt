@@ -30,8 +30,10 @@ setTemperatureAccelerationParameters	KEYWORD2
 setVocAlgorithmState	KEYWORD2
 getVocAlgorithmState	KEYWORD2
 activateShtHeater	KEYWORD2
+getShtHeaterMeasurements	KEYWORD2
 getProductName	KEYWORD2
 getSerialNumber	KEYWORD2
+getVersion	KEYWORD2
 readDeviceStatus	KEYWORD2
 readAndClearDeviceStatus	KEYWORD2
 deviceReset	KEYWORD2
