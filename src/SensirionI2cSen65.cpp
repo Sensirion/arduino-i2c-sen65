@@ -3,7 +3,7 @@
  *
  * Generator:     sensirion-driver-generator 1.1.2
  * Product:       sen65
- * Model-Version: 1.2.0
+ * Model-Version: 1.3.0
  */
 /*
  * Copyright (c) 2025, Sensirion AG
@@ -615,7 +615,30 @@ int16_t SensirionI2cSen65::activateShtHeater() {
     if (localError != NO_ERROR) {
         return localError;
     }
-    delay(1300);
+    delay(20);
+    return localError;
+}
+
+int16_t SensirionI2cSen65::getShtHeaterMeasurements(int16_t& humidity,
+                                                    int16_t& temperature) {
+    int16_t localError = NO_ERROR;
+    uint8_t* buffer_ptr = communication_buffer;
+    SensirionI2CTxFrame txFrame =
+        SensirionI2CTxFrame::createWithUInt16Command(0x6790, buffer_ptr, 6);
+    localError =
+        SensirionI2CCommunication::sendFrame(_i2cAddress, txFrame, *_i2cBus);
+    if (localError != NO_ERROR) {
+        return localError;
+    }
+    delay(20);
+    SensirionI2CRxFrame rxFrame(buffer_ptr, 6);
+    localError = SensirionI2CCommunication::receiveFrame(_i2cAddress, 6,
+                                                         rxFrame, *_i2cBus);
+    if (localError != NO_ERROR) {
+        return localError;
+    }
+    localError |= rxFrame.getInt16(humidity);
+    localError |= rxFrame.getInt16(temperature);
     return localError;
 }
 
@@ -660,6 +683,29 @@ int16_t SensirionI2cSen65::getSerialNumber(int8_t serialNumber[],
         return localError;
     }
     localError |= rxFrame.getBytes((uint8_t*)serialNumber, serialNumberSize);
+    return localError;
+}
+
+int16_t SensirionI2cSen65::getVersion(uint8_t& firmwareMajor,
+                                      uint8_t& firmwareMinor) {
+    int16_t localError = NO_ERROR;
+    uint8_t* buffer_ptr = communication_buffer;
+    SensirionI2CTxFrame txFrame =
+        SensirionI2CTxFrame::createWithUInt16Command(0xd100, buffer_ptr, 3);
+    localError =
+        SensirionI2CCommunication::sendFrame(_i2cAddress, txFrame, *_i2cBus);
+    if (localError != NO_ERROR) {
+        return localError;
+    }
+    delay(20);
+    SensirionI2CRxFrame rxFrame(buffer_ptr, 3);
+    localError = SensirionI2CCommunication::receiveFrame(_i2cAddress, 3,
+                                                         rxFrame, *_i2cBus);
+    if (localError != NO_ERROR) {
+        return localError;
+    }
+    localError |= rxFrame.getUInt8(firmwareMajor);
+    localError |= rxFrame.getUInt8(firmwareMinor);
     return localError;
 }
 
